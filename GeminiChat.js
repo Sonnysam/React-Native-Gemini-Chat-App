@@ -17,19 +17,25 @@ const GeminiChat = () => {
   const API_KEY = "AIzaSyBJH2xrrsHEVzh9oJ9hFnlMgV7Ev78Fatg";
 
   useEffect(() => {
-    const initChat = async () => {
+    const startChat = async () => {
       const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const prompt = "Hi there! ";
+      const prompt = "hello! ";
       const result = await model.generateContent(prompt);
       const response = result.response;
       const text = response.text();
-      setMessages([{ text, user: false }]);
+      console.log(text);
+      setMessages([
+        {
+          text,
+          user: false,
+        },
+      ]);
     };
-    initChat();
+    startChat();
   }, []);
 
-  const onSend = async () => {
+  const sendMessage = async () => {
     setLoading(true);
     const userMessage = { text: userInput, user: true };
     setMessages([...messages, userMessage]);
@@ -55,6 +61,7 @@ const GeminiChat = () => {
 
   return (
     <View style={styles.container}>
+      {/* <Text>Hello!!</Text> */}
       <FlatList
         data={messages}
         renderItem={renderMessage}
@@ -63,29 +70,31 @@ const GeminiChat = () => {
       />
       <View style={styles.inputContainer}>
         <TextInput
-          value={userInput}
+          placeholder="Type a message"
           onChangeText={setUserInput}
-          placeholder="Type a message..."
-          onSubmitEditing={onSend}
+          value={userInput}
+          onSubmitEditing={sendMessage}
+          style={styles.input}
+          placeholderTextColor="black"
         />
-        {loading && (
-          <ActivityIndicator
-            size="small"
-            color="#000000"
-            style={styles.loadingText}
-          />
-        )}
+        {loading && <ActivityIndicator size="small" color="black" />}
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#474F7A" },
   messageContainer: { padding: 10, marginVertical: 5 },
   messageText: { fontSize: 16 },
-  userMessage: { backgroundColor: "#f0f0f0" },
+  // userMessage: { backgroundColor: "#f0f0f0" },
   inputContainer: { flexDirection: "row", alignItems: "center", padding: 10 },
+  input: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+  },
 });
 
 export default GeminiChat;
