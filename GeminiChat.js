@@ -8,11 +8,15 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import * as Speech from "expo-speech";
+import { FontAwesome } from "@expo/vector-icons";
 
 const GeminiChat = () => {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [toggleMic, setToggleMic] = useState(false);
 
   const API_KEY = "AIzaSyBJH2xrrsHEVzh9oJ9hFnlMgV7Ev78Fatg";
 
@@ -49,6 +53,21 @@ const GeminiChat = () => {
     setMessages([...messages, { text, user: false }]);
     setLoading(false);
     setUserInput("");
+
+    Speech.speak(text);
+    setIsSpeaking(true);
+  };
+
+  //toggle speech function
+  const toggleSpeech = () => {
+    setToggleMic(!toggleMic);
+    if (toggleMic) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      Speech.speak(userInput);
+      setIsSpeaking(true);
+    }
   };
 
   const renderMessage = ({ item }) => (
@@ -69,6 +88,14 @@ const GeminiChat = () => {
         inverted
       />
       <View style={styles.inputContainer}>
+        {/* microphone icon */}
+        <FontAwesome
+          name="microphone"
+          size={24}
+          color="black"
+          style={{ marginRight: 10 }}
+          onPress={() => toggleSpeech}
+        />
         <TextInput
           placeholder="Type a message"
           onChangeText={setUserInput}
@@ -84,7 +111,7 @@ const GeminiChat = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#474F7A" },
+  container: { flex: 1, backgroundColor: "#ffff" },
   messageContainer: { padding: 10, marginVertical: 5 },
   messageText: { fontSize: 16 },
   // userMessage: { backgroundColor: "#f0f0f0" },
