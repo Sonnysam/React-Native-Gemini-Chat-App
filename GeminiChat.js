@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import * as Speech from "expo-speech";
 import { FontAwesome } from "@expo/vector-icons";
@@ -16,7 +17,6 @@ const GeminiChat = () => {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [toggleMic, setToggleMic] = useState(false);
 
   const API_KEY = "AIzaSyBJH2xrrsHEVzh9oJ9hFnlMgV7Ev78Fatg";
 
@@ -54,20 +54,14 @@ const GeminiChat = () => {
     setLoading(false);
     setUserInput("");
 
-    Speech.speak(text);
-    setIsSpeaking(true);
+    if (text) {
+      Speech.speak(text);
+    }
   };
 
-  //toggle speech function
   const toggleSpeech = () => {
-    setToggleMic(!toggleMic);
-    if (toggleMic) {
-      Speech.stop();
-      setIsSpeaking(false);
-    } else {
-      Speech.speak(userInput);
-      setIsSpeaking(true);
-    }
+    // setIsSpeaking(!isSpeaking);
+    console.log("isSpeaking", isSpeaking);
   };
 
   const renderMessage = ({ item }) => (
@@ -80,7 +74,6 @@ const GeminiChat = () => {
 
   return (
     <View style={styles.container}>
-      {/* <Text>Hello!!</Text> */}
       <FlatList
         data={messages}
         renderItem={renderMessage}
@@ -89,13 +82,17 @@ const GeminiChat = () => {
       />
       <View style={styles.inputContainer}>
         {/* microphone icon */}
-        <FontAwesome
-          name="microphone"
-          size={24}
-          color="black"
-          style={{ marginRight: 10 }}
-          onPress={() => toggleSpeech}
-        />
+        <TouchableOpacity style={styles.micIcon} onPress={toggleSpeech}>
+          <FontAwesome
+            name="microphone"
+            size={24}
+            color="black"
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          />
+        </TouchableOpacity>
         <TextInput
           placeholder="Type a message"
           onChangeText={setUserInput}
@@ -111,7 +108,7 @@ const GeminiChat = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffff" },
+  container: { flex: 1, backgroundColor: "#ffff", marginTop: 50 },
   messageContainer: { padding: 10, marginVertical: 5 },
   messageText: { fontSize: 16 },
   // userMessage: { backgroundColor: "#f0f0f0" },
@@ -119,8 +116,19 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     padding: 10,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#B7C9F2",
     borderRadius: 10,
+    height: 50,
+  },
+  micIcon: {
+    padding: 10,
+    backgroundColor: "#B7C9F2",
+    borderRadius: 25,
+    height: 50,
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 5,
   },
 });
 
