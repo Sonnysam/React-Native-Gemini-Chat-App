@@ -11,14 +11,17 @@ import {
 } from "react-native";
 import * as Speech from "expo-speech";
 import { FontAwesome } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 const GeminiChat = () => {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showStopIcon, setShowStopIcon] = useState(false);
 
-  const API_KEY = "AIzaSyBJH2xrrsHEVzh9oJ9hFnlMgV7Ev78Fatg";
+  const API_KEY = "AIzaSyA-RiB6nvzquymNr4YPUXcfMY3LQd2pxJ4";
 
   useEffect(() => {
     const startChat = async () => {
@@ -29,6 +32,13 @@ const GeminiChat = () => {
       const response = result.response;
       const text = response.text();
       console.log(text);
+      showMessage({
+        message: "Welcome to Gemini Chat 🤖",
+        description: text,
+        type: "info",
+        icon: "info",
+        duration: 2000,
+      });
       setMessages([
         {
           text,
@@ -36,6 +46,7 @@ const GeminiChat = () => {
         },
       ]);
     };
+    //function call
     startChat();
   }, []);
 
@@ -54,14 +65,30 @@ const GeminiChat = () => {
     setLoading(false);
     setUserInput("");
 
-    if (text) {
+    // if (text) {
+    //   Speech.speak(text);
+    // }
+    if (text && !isSpeaking) {
       Speech.speak(text);
+      setIsSpeaking(true);
+      setShowStopIcon(true);
     }
   };
 
   const toggleSpeech = () => {
-    // setIsSpeaking(!isSpeaking);
     console.log("isSpeaking", isSpeaking);
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      Speech.speak(messages[messages.length - 1].text);
+      setIsSpeaking(true);
+    }
+  };
+
+  const ClearMessage = () => {
+    setMessages("");
+    setIsSpeaking(false);
   };
 
   const renderMessage = ({ item }) => (
@@ -81,17 +108,28 @@ const GeminiChat = () => {
         inverted
       />
       <View style={styles.inputContainer}>
-        {/* microphone icon */}
         <TouchableOpacity style={styles.micIcon} onPress={toggleSpeech}>
-          <FontAwesome
-            name="microphone"
-            size={24}
-            color="black"
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          />
+          {isSpeaking ? (
+            <FontAwesome
+              name="microphone-slash"
+              size={24}
+              color="white"
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            />
+          ) : (
+            <FontAwesome
+              name="microphone"
+              size={24}
+              color="white"
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            />
+          )}
         </TouchableOpacity>
         <TextInput
           placeholder="Type a message"
@@ -99,9 +137,17 @@ const GeminiChat = () => {
           value={userInput}
           onSubmitEditing={sendMessage}
           style={styles.input}
-          placeholderTextColor="black"
+          placeholderTextColor="#fff"
         />
-        {loading && <ActivityIndicator size="small" color="black" />}
+        {
+          //show stop icon only when speaking
+          showStopIcon && (
+            <TouchableOpacity style={styles.stopIcon} onPress={ClearMessage}>
+              <Entypo name="controller-stop" size={24} color="white" />
+            </TouchableOpacity>
+          )
+        }
+        {/* {loading && <ActivityIndicator size="large" color="black" />} */}
       </View>
     </View>
   );
@@ -111,24 +157,34 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#ffff", marginTop: 50 },
   messageContainer: { padding: 10, marginVertical: 5 },
   messageText: { fontSize: 16 },
-  // userMessage: { backgroundColor: "#f0f0f0" },
   inputContainer: { flexDirection: "row", alignItems: "center", padding: 10 },
   input: {
     flex: 1,
     padding: 10,
-    backgroundColor: "#B7C9F2",
+    backgroundColor: "#131314",
     borderRadius: 10,
     height: 50,
+    color: "white",
   },
   micIcon: {
     padding: 10,
-    backgroundColor: "#B7C9F2",
+    backgroundColor: "#131314",
     borderRadius: 25,
     height: 50,
     width: 50,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 5,
+  },
+  stopIcon: {
+    padding: 10,
+    backgroundColor: "#131314",
+    borderRadius: 25,
+    height: 50,
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 3,
   },
 });
 

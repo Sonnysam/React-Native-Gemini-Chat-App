@@ -16,6 +16,7 @@
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
     "react-native": "0.73.4",
+    "react-native-flash-message": "^0.4.2",
     "react-native-gifted-chat": "^2.4.0",
     "react-native-vector-icons": "^10.0.3"
   },
